@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: 220 38% 47%;
+  --color-primary-dark: 220 44% 35%;
+  --color-gold: 43 74% 49%;
+  --color-red: 0 73% 41%;
+  --color-red-dark: 0 73% 30%;
+  --color-gray-50: 210 20% 98%;
+  --color-gray-100: 220 14% 96%;
+  --color-gray-200: 220 13% 91%;
+  --color-gray-300: 216 12% 84%;
+  --color-gray-400: 217 11% 65%;
+  --color-gray-500: 220 9% 46%;
+  --color-gray-600: 215 14% 34%;
+  --color-gray-700: 217 19% 27%;
+  --color-gray-800: 215 28% 17%;
+  --color-gray-900: 221 39% 11%;
+  --color-gray-950: 224 71% 4%;
+  
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+.dark {
+  --color-primary: 219 48% 57%;
+  --color-primary-dark: 219 44% 45%;
+  --color-gold: 43 74% 59%;
+}
+
+@layer base {
+  body {
+    @apply font-body text-gray-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-950 transition-colors duration-300;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold leading-tight;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  h4 {
+    @apply text-xl md:text-2xl;
+  }
+
+  p {
+    @apply leading-relaxed;
+  }
+
+  .container {
+    @apply px-4 mx-auto max-w-7xl;
+  }
+}
+
+.page-transition {
+  @apply w-full mx-auto overflow-hidden;
+}
+
+.gradient-text {
+  @apply bg-gradient-to-r from-red-600 to-amber-500 bg-clip-text text-transparent;
+}
+
+.header-blur {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.hover-underline-animation {
+  position: relative;
+}
+
+.hover-underline-animation::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  transform-origin: bottom right;
+  transition: transform 0.3s ease-out;
+  @apply bg-red-600 dark:bg-gold;
+}
+
+.hover-underline-animation:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* Masonry grid layout for blog/reviews */
+.masonry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .masonry-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .masonry-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
