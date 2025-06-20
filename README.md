@@ -40,5 +40,5 @@
 
 ## 📸 Live Demo
 
-> 🖥️ View the website here: [https://your-deployed-link.com](https://your-deployed-link.com)
+> 🖥️ View the website here: [https://your-deployed-link.com](https://flicktales-cinema-blog.vercel.app)
 
