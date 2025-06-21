@@ -190,7 +190,7 @@ const About = () => {
           className="text-center mb-12"
         >
           <h2 className="text-3xl md:text-4xl font-heading font-semibold mb-4 text-gray-900 dark:text-white">
-            Meet the Minds Behind CineScope
+            Meet the Minds Behind FlickTales
           </h2>
           <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             A small team of passionate storytellers & cine‑obsessives.
