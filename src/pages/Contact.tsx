@@ -1,38 +1,86 @@
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ChevronRight, Star } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Mail, MapPin, Phone, Send, CheckCircle } from 'lucide-react';
 import Button from '../components/UI/Button';
-import { blogPosts } from '../data/blogPosts';
-import { movieReviews } from '../data/reviews';
-import SplitText from '../animation/SplitText';
+import emailjs from '@emailjs/browser';
 
-const Home = () => {
+const Contact = () => {
   useEffect(() => {
-    document.title = 'FlickTales | Home';
+    document.title = 'Contact | FlickTales';
   }, []);
 
-  const featuredBlogPosts = blogPosts.slice(0, 3);
-  const featuredReviews = movieReviews.slice(0, 3);
+  const [formState, setFormState] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.2,
-      },
-    },
+  const [formErrors, setFormErrors] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormState((prev) => ({ ...prev, [name]: value }));
+
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: '' }));
+    }
   };
 
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.5 },
-    },
+  const validateForm = () => {
+    const errors = { name: '', email: '', message: '' };
+    let isValid = true;
+
+    if (!formState.name.trim()) {
+      errors.name = 'Name is required';
+      isValid = false;
+    }
+
+    if (!formState.email.trim()) {
+      errors.email = 'Email is required';
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formState.email)) {
+      errors.email = 'Invalid email format';
+      isValid = false;
+    }
+
+    if (!formState.message.trim()) {
+      errors.message = 'Message is required';
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+
+    const serviceId = 'service_udj37o7';
+    const templateId = 'template_g0fotwl';
+    const publicKey = 'yf1rjWW9q35vtEOtl';
+
+    emailjs
+      .send(serviceId, templateId, formState, publicKey)
+      .then(() => {
+        setIsSubmitting(false);
+        setIsSubmitted(true);
+        setFormState({ name: '', email: '', subject: '', message: '' });
+      })
+      .catch((error) => {
+        console.error('EmailJS error:', error);
+        setIsSubmitting(false);
+      });
   };
 
   return (
@@ -40,234 +88,152 @@ const Home = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.6 }}
+      className="pt-24 pb-20 bg-gray-50 dark:bg-gradient-to-b dark:from-gray-950 dark:via-gray-900 dark:to-black text-gray-900 dark:text-white transition-colors duration-300"
     >
-      {/* ===== Hero Section ===== */}
-      <section className="relative h-screen flex items-center overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: 'url(/images/bg.png)',
-            backgroundPosition: 'center 40%',
-          }}
+      {/* ===== Header Section ===== */}
+      <section className="text-center mb-16 px-6">
+        <motion.h1
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.7 }}
+          className="text-5xl md:text-6xl font-heading font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-red-600 via-yellow-400 to-orange-500"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-950/95 via-gray-900/90 to-transparent dark:from-black/95 dark:via-gray-950/80 dark:to-transparent" />
-        </div>
+          Get in Touch
+        </motion.h1>
+        <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">
+          We’d love to hear from you — whether it’s feedback, collaboration, or just to say hello 🎬
+        </p>
+      </section>
 
-        <div className="container relative z-10 px-6">
+      {/* ===== Contact Info ===== */}
+      <section className="container mx-auto px-6 mb-16 grid md:grid-cols-3 gap-8">
+        {[
+          {
+            icon: <Mail size={26} />,
+            title: 'Email',
+            text: 'support@flicktales.com'
+          },
+          {
+            icon: <Phone size={26} />,
+            title: 'Phone',
+            text: '+91 98765 43210'
+          },
+          {
+            icon: <MapPin size={26} />,
+            title: 'Location',
+            text: 'Agra, Uttar Pradesh, India'
+          }
+        ].map((item, i) => (
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="max-w-3xl text-white"
+            key={i}
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.3 }}
+            className="rounded-2xl p-6 bg-white/60 dark:bg-white/5 backdrop-blur-md border border-gray-200 dark:border-gray-800 hover:border-red-500/40 shadow-md hover:shadow-red-500/10 text-center transition-all"
           >
-            <h1 className="mb-6 text-5xl md:text-6xl lg:text-7xl font-heading font-extrabold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-              <SplitText text="FlickTales" />
-            </h1>
-
-            <p className="text-lg md:text-xl text-gray-300 leading-relaxed mb-8">
-              <SplitText
-                text="A cinematic journey through thoughtful reviews, deep analysis, and passionate film conversations."
-                className="text-gray-200 leading-relaxed"
-                delay={40}
-                animationFrom={{ opacity: 0, transform: 'translate3d(0,20px,0)' }}
-                animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
-              />
-            </p>
-
-            <div className="flex flex-wrap gap-4">
-              <Button to="/blog" size="lg">
-                Read Our Blog
-              </Button>
-              <Button to="/reviews" variant="outline" size="lg">
-                Latest Reviews
-              </Button>
+            <div className="mb-4 text-red-600 dark:text-yellow-400 flex justify-center">
+              {item.icon}
             </div>
+            <h3 className="text-lg font-semibold mb-1">{item.title}</h3>
+            <p className="text-gray-700 dark:text-gray-400">{item.text}</p>
           </motion.div>
-        </div>
-
-        {/* bottom fade */}
-        <div className="absolute bottom-0 w-full h-24 bg-gradient-to-t from-gray-950 dark:from-black to-transparent" />
+        ))}
       </section>
 
-      {/* ===== Featured Articles ===== */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-900 transition-colors">
-        <div className="container px-6">
-          <div className="text-center mb-14">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-3xl md:text-4xl font-heading font-semibold text-gray-900 dark:text-white mb-3"
-            >
-              <SplitText text="Featured Articles" />
-            </motion.h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              <SplitText text="Dive into our thoughtful analysis and perspectives on cinema" />
-            </p>
-          </div>
+      {/* ===== Contact Form ===== */}
+      <section className="container mx-auto px-6">
+        <motion.form
+          onSubmit={handleSubmit}
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="max-w-2xl mx-auto p-10 rounded-3xl backdrop-blur-xl bg-white/60 dark:bg-white/5 border border-gray-200 dark:border-gray-800 shadow-lg hover:shadow-red-500/10 transition-all"
+        >
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            {/* Name */}
+            <div>
+              <input
+                type="text"
+                name="name"
+                placeholder="Your Name"
+                value={formState.name}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg bg-white dark:bg-white/5 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+              {formErrors.name && (
+                <p className="text-red-500 dark:text-red-400 text-sm mt-1">{formErrors.name}</p>
+              )}
+            </div>
 
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            {featuredBlogPosts.map((post) => (
-              <motion.article
-                key={post.id}
-                variants={itemVariants}
-                className="rounded-2xl overflow-hidden backdrop-blur-md bg-white/70 dark:bg-white/5 border border-gray-200 dark:border-gray-800 shadow-lg hover:shadow-red-500/10 transition-all duration-300"
-              >
-                <Link to={`/blog/${post.id}`} className="block">
-                  <div className="h-56 overflow-hidden">
-                    <img
-                      src={post.image}
-                      alt={post.title}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <span className="text-sm font-medium text-red-600 dark:text-yellow-400 uppercase tracking-wide">
-                      {post.category}
-                    </span>
-                    <h3 className="text-xl font-heading font-semibold mt-2 mb-2 text-gray-900 dark:text-white">
-                      {post.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
-                      {post.description}
-                    </p>
-                    <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-                      <span>{post.date}</span>
-                      <span className="inline-flex items-center text-red-600 dark:text-yellow-400 font-medium">
-                        Read more <ChevronRight size={16} className="ml-1" />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              </motion.article>
-            ))}
-          </motion.div>
-
-          <div className="text-center mt-12">
-            <Button to="/blog" variant="ghost">
-              View All Articles
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== Latest Reviews ===== */}
-      <section className="py-20 bg-white dark:bg-gray-950 transition-colors">
-        <div className="container px-6">
-          <div className="text-center mb-14">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-3xl md:text-4xl font-heading font-semibold text-gray-900 dark:text-white mb-3"
-            >
-              <SplitText text="Latest Reviews" />
-            </motion.h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              <SplitText text="Our takes on the most recent and notable films" />
-            </p>
-          </div>
-
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            {featuredReviews.map((review) => (
-              <motion.article
-                key={review.id}
-                variants={itemVariants}
-                className="rounded-2xl overflow-hidden backdrop-blur-md bg-white/70 dark:bg-white/5 border border-gray-200 dark:border-gray-800 shadow-lg hover:shadow-yellow-500/10 transition-all duration-300"
-              >
-                <Link to={`/reviews/${review.id}`} className="block">
-                  <div className="h-72 overflow-hidden">
-                    <img
-                      src={review.poster}
-                      alt={review.movieTitle}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <div className="flex items-center mb-2">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          size={16}
-                          className={
-                            i < Math.floor(review.rating)
-                              ? 'text-yellow-400 fill-current'
-                              : 'text-gray-300 dark:text-gray-600'
-                          }
-                        />
-                      ))}
-                      <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {review.rating.toFixed(1)}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-heading font-semibold mb-1 text-gray-900 dark:text-white">
-                      {review.movieTitle}
-                    </h3>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mb-3">
-                      {review.director}, {review.year}
-                    </p>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
-                      {review.synopsis}
-                    </p>
-                    <span className="inline-flex items-center text-red-600 dark:text-yellow-400 font-medium text-sm">
-                      Read Review <ChevronRight size={16} className="ml-1" />
-                    </span>
-                  </div>
-                </Link>
-              </motion.article>
-            ))}
-          </motion.div>
-
-          <div className="text-center mt-12">
-            <Button to="/reviews" variant="ghost">
-              View All Reviews
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== Call to Action ===== */}
-      <section className="py-20 bg-gradient-to-b from-gray-900 to-black text-white">
-        <div className="container px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="max-w-3xl mx-auto text-center"
-          >
-            <h2 className="text-3xl md:text-4xl font-heading font-semibold mb-4">
-              <SplitText text="Join Our Community" />
-            </h2>
-            <p className="text-gray-400 mb-8">
-              <SplitText text="Subscribe to our newsletter and be part of the conversation about cinema, art, and culture." />
-            </p>
-            <form className="flex flex-col sm:flex-row gap-4 justify-center">
+            {/* Email */}
+            <div>
               <input
                 type="email"
-                placeholder="Your email address"
-                className="px-4 py-3 rounded-md bg-white/10 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 text-white flex-grow max-w-md"
-                aria-label="Email address"
+                name="email"
+                placeholder="Your Email"
+                value={formState.email}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg bg-white dark:bg-white/5 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
               />
-              <Button type="submit" variant="primary" size="lg">
-                Subscribe
-              </Button>
-            </form>
+              {formErrors.email && (
+                <p className="text-red-500 dark:text-red-400 text-sm mt-1">{formErrors.email}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Subject */}
+          <input
+            type="text"
+            name="subject"
+            placeholder="Subject (Optional)"
+            value={formState.subject}
+            onChange={handleChange}
+            className="w-full px-4 py-3 mb-6 rounded-lg bg-white dark:bg-white/5 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+          />
+
+          {/* Message */}
+          <textarea
+            name="message"
+            rows="6"
+            placeholder="Your Message..."
+            value={formState.message}
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-lg bg-white dark:bg-white/5 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+          ></textarea>
+          {formErrors.message && (
+            <p className="text-red-500 dark:text-red-400 text-sm mt-1">{formErrors.message}</p>
+          )}
+
+          {/* Submit */}
+          <div className="mt-8 flex justify-center">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex items-center bg-gradient-to-r from-red-600 to-yellow-500 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:scale-105 transition-transform duration-300"
+            >
+              {isSubmitting ? 'Sending...' : 'Send Message'}
+              <Send size={18} className="ml-2" />
+            </Button>
+          </div>
+        </motion.form>
+
+        {/* Success Message */}
+        {isSubmitted && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mt-10 text-green-600 dark:text-green-400 font-semibold flex justify-center items-center gap-2"
+          >
+            <CheckCircle size={22} /> Message Sent Successfully!
           </motion.div>
-        </div>
+        )}
       </section>
+
+      {/* ===== Cinematic Divider ===== */}
+      <div className="mt-20 h-1 bg-gradient-to-r from-red-600 via-yellow-400 to-red-600 opacity-70 w-3/4 mx-auto rounded-full blur-sm" />
     </motion.div>
   );
 };
 
-export default Home;
+export default Contact;
